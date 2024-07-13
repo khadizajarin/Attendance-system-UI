@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useOutletContext } from "react-router-dom";
+import CountdownDisplay from "./CountdownDisplay";
 
 const StudentPage = () => {
   const { ongoingSession } = useOutletContext();
@@ -31,11 +32,7 @@ const StudentPage = () => {
     return (sum / marks.length).toFixed(2);
   };
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
+  
 
   return (
     <div>
@@ -56,30 +53,8 @@ const StudentPage = () => {
       </div>
 
       {/* Ongoing session */}
-      {ongoingSession ? (
-      <div className="p-10">
-        <div className="flex flex-row-reverse justify-center gap-28">
-          <div>
-            <div className="mb-4 text-3xl font-bold">
-              Currently a session is conducted <br />
-              <span className="text-lg">by Rudra Pratap Deb Nath.</span>
-            </div>
-            <div className="mb-4 text-3xl font-bold">
-              Would you like to provide attendance <br /> for the ongoing session?
-            </div>
-            <p className="text-xl font-semibold">Course Name : {ongoingSession.course_name}</p>
-            <p className="text-xl font-semibold">Course Code : {ongoingSession.course_code}</p>
-            <p className="text-xl font-semibold">Date : {new Date(ongoingSession.date).toLocaleString()}</p>
-            <p className="text-xl font-semibold">Duration : {ongoingSession.duration} minutes</p>
-            {/* <p className="text-xl font-semibold">Time left for the session to end : {formatTime(timeLeft)}</p> */}
-          </div>
-          <div className="flex justify-center items-center"><img className="w-64" src="https://www.freepnglogos.com/uploads/qr-code-png/qr-code-download-music-code-raffael-15.png" alt="QR Code" /></div>
-        </div>
-      </div>
-      ) : (<></>)}
-      <div>
-        <hr className="border-2" style={{ borderColor: '#CCCCCC' }} />
-      </div>
+       <CountdownDisplay />
+
 
       {/* student information */}
       <div>
