@@ -81,7 +81,7 @@ const StudentPage = () => {
                     <TableCell className="p-3 text-center">{course.code}</TableCell>
                     <TableCell className="p-3 text-center">{course.total_held_classes}</TableCell>
                     <TableCell className="p-3 text-center">{student.attended}</TableCell>
-                    <TableCell className="p-3 text-center">{((student.attended /course.total_held_classes)*100).toFixed(2)}</TableCell>
+                    <TableCell className="p-3 text-center">{((student.attended /course.total_held_classes)*100).toFixed(2)} %</TableCell>
                     <TableCell className="p-3 text-center"><Popover>
                             <PopoverTrigger><Button>{calculateAverage(student.ctma_marks)}</Button></PopoverTrigger>
                             <PopoverContent style={{ position: 'absolute', top:'50%', left: '50%', transform: 'translate(-200%, -100%)' }} className="w-96 shadow-slate-950 shadow-2xl"> 

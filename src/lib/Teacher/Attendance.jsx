@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react/prop-types */
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import AttendanceSheet from "./AttendanceSheet";
+import QRCode from "qrcode.react";
 
 const Attendance = () => {
   const [courses, setCourses] = useState([]);
@@ -18,6 +19,7 @@ const Attendance = () => {
     date: "",
     time: "",
   });
+  const [qrCodeData, setQrCodeData] = useState("");
   const teacherName = 'Dr. Rudra Pratap Deb Nath';
   const courseCode = 'CSE-413';
 
@@ -41,23 +43,26 @@ const Attendance = () => {
     setWarning('');
     const formData = new FormData(e.target);
     const minutes = parseInt(formData.get('minutes'), 10);
-  
-    // Set session details
+
     const newSessionDetails = {
       courseName: formData.get('course_name'),
       courseCode: formData.get('course_code'),
       date: formData.get('date'),
       time: formData.get('time'),
     };
-  
+
     setSessionDetails(newSessionDetails);
     localStorage.setItem('sessionDetails', JSON.stringify(newSessionDetails));
-  
+
+    const qrData = `${newSessionDetails.courseName}|${newSessionDetails.courseCode}|${newSessionDetails.date}|${newSessionDetails.time}`;
+    setQrCodeData(qrData);
+    localStorage.setItem('qrCodeData', qrData); // Store QR code data in localStorage
+
     startCountdown(minutes);
     console.log("Session created with data:", formData);
     e.target.reset();
   };
-  
+
   const CreateSessionForm = ({ course, onSubmit }) => {
     const localDate = new Date();
     const localDateString = localDate.toLocaleDateString("en-CA");
@@ -65,7 +70,7 @@ const Attendance = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
-  
+
     return (
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
@@ -128,14 +133,7 @@ const Attendance = () => {
     );
   };
 
-  const [totalMinutes, setTotalMinutes] = useState(0);
   const [countdown, setCountdown] = useState(0);
-
-  const convertToHoursMinutes = (totalMinutes) => {
-    const hrs = Math.floor(totalMinutes / 60);
-    const mins = totalMinutes % 60;
-    return { hours: hrs, minutes: mins };
-  };
 
   const startCountdown = (totalMinutes) => {
     setSessionActive(true);
@@ -160,16 +158,14 @@ const Attendance = () => {
     return interval;
   };
 
-  
-
   useEffect(() => {
     const endTime = localStorage.getItem('countdownEndTime');
     const savedSessionDetails = localStorage.getItem('sessionDetails');
-  
+
     if (savedSessionDetails) {
       setSessionDetails(JSON.parse(savedSessionDetails));
     }
-  
+
     if (endTime) {
       const remainingTime = Math.floor((endTime - Date.now()) / 1000);
       if (remainingTime > 0) {
@@ -195,9 +191,6 @@ const Attendance = () => {
       }
     }
   }, []);
-  
-
- 
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -228,22 +221,29 @@ const Attendance = () => {
       </div>
 
       {countdown > 0 && (
-        <div>
-          <div className="flex justify-center mt-4 mb-4">
-          <div className="text-center">
-            <p className="text-xl font-bold">Course Name: {sessionDetails.courseName}</p>
-            <p className="text-xl font-bold">Course Code: {sessionDetails.courseCode}</p>
-            <p className="text-xl font-bold">Session Date: {sessionDetails.date}</p>
-            <p className="text-xl font-bold">Starting Time: {sessionDetails.time}</p>
-            <p className="text-xl font-bold">Time left: {formatTime(countdown)}</p>
+        <div className="p-10">
+          <div className="flex flex-row-reverse justify-center gap-28 ">
+            <div>
+              <div className="mb-4 text-3xl font-bold">
+                Currently a session is conducted <br />
+                {/* <span className="text-lg"></span> */}
+              </div>
+              <div className="mb-4 text-3xl font-bold">
+                Would you like to provide attendance <br /> for the ongoing session?
+              </div>
+              <p className="text-xl font-semibold">Course Name : {sessionDetails.courseName}</p>
+              <p className="text-xl font-semibold">Course Code : {sessionDetails.courseCode}</p>
+              <p className="text-xl font-semibold">Date : {sessionDetails.date}</p>
+              <p className="text-xl font-semibold">Starting Time: {sessionDetails.time}</p>
+              <p className="text-xl font-semibold">Time left: {formatTime(countdown)}</p>
+            </div>
+            <div className="flex justify-center items-center"><QRCode className="w-64" size={240} fgColor={'#66798F'} value={qrCodeData} /></div>
+          </div>
+          <div>
+            <hr className="border-2 mt-8" style={{ borderColor: '#CCCCCC' }} />
           </div>
         </div>
-        <div>
-          <hr className="border-2" style={{ borderColor: '#CCCCCC' }} />
-        </div>
-        </div>
       )}
-
 
       {warning && (
         <div className="flex justify-center mt-4">
@@ -281,13 +281,13 @@ const Attendance = () => {
                   </TableCell>
                   <TableCell className="text-center">
                     <Popover>
-                      <PopoverTrigger >
+                      <PopoverTrigger>
                         <Button onClick={(e) => {
-                            if (sessionActive) {
-                              e.preventDefault();
-                              setWarning("You can't create session more than once at a time");
-                            }
-                          }}>Create Session</Button>
+                          if (sessionActive) {
+                            e.preventDefault();
+                            setWarning("You can't create session more than once at a time");
+                          }
+                        }}>Create Session</Button>
                       </PopoverTrigger>
                       {!sessionActive && (
                         <PopoverContent
