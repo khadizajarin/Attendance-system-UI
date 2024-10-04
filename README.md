@@ -21,7 +21,7 @@ This repository contains the initial version of the Smart Attendance System deve
 1. Clone the repository:
    ```bash
    git clone https://github.com/khadizajarin/Attendance-system-UI
-   cd your-repo-name
+   cd Attendance-system-UI
    ```
 2. Install dependencies:
    ```bash
